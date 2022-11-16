@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 RESNET_INPUT_SIZE = 224
 IMG_SIZE = RESNET_INPUT_SIZE
 THICKNESS = 5
-B, G, R = 255, 0, 0
+B_intensity, G, R = 255, 0, 0
 
 def twopoints3d(IMG_SIZE):
     """
@@ -89,7 +89,7 @@ def angle3d(vec1, vec2):
     [x2, y2, z2] = vec2
     nom = x1 * x2 + y1 * y2 + z1 * z2
     denom = sqrt((x1 ** 2 + y1 ** 2 + z1 ** 2) * (x2 ** 2 + y2 ** 2 + z2 ** 2))
-    alpha = acos(nom / denom) * 180 /pi
+    alpha = int(acos(nom / denom) * 180 /pi)
     return alpha
 
 def xyimage(A, B, img):
@@ -103,11 +103,7 @@ def xyimage(A, B, img):
     """
     x1, y1, z1 = A
     x2, y2, z2 = B
-    # diameter = hypot(z2 - z1, y2 - y1)
-    # r = int(diameter / 2)
-    # x_center, y_center = int(0.5 * (x1 + x2)), int(0.5 * (y1 + y2))
-    # cv2.circle(img, (x_center, y_center), r, (190, 190, 190), -1)  # -1 solid circle
-    cv2.line(img, (x1, y1), (x2, y2), (B, G, R), THICKNESS)
+    cv2.line(img, (x1, y1), (x2, y2), (B_intensity,G,R), THICKNESS)
     pass
 
 def yzimage(A, B, img):
@@ -125,7 +121,7 @@ def yzimage(A, B, img):
     # r = int(diameter / 2)
     # x_center, y_center = int(0.5 * (x1 + x2)), int(0.5 * (y1 + y2))
     # cv2.circle(img, (x_center, y_center), r, (190, 190, 190), -1)  # -1 solid circle
-    cv2.line(img, (y1, z1), (y2, z2), (B, G, R), THICKNESS)
+    cv2.line(img, (y1, z1), (y2, z2), (B_intensity, G, R), THICKNESS)
     pass
 
 # todo: add .png files and weight file to git ignore.
@@ -138,7 +134,7 @@ if os.path.exists(images_path) and os.path.isdir(images_path):
     pass
 os.makedirs(images_path, exist_ok=True)
 
-for i in range(1):
+for i in range(1000):
     A, B = twopoints3d(IMG_SIZE)
     P = xyplaneintersection(A, B)
     vec1, vec2 = twovectors(P, A)
@@ -156,5 +152,7 @@ for i in range(1):
     cv2.imwrite(f'{images_path}/frame_{i}_angle_{alpha}_xyplane.png', img_xy)
     cv2.imwrite(f'{images_path}/frame_{i}_angle_{alpha}_flippedxyplane.png', flipped_xy)
     cv2.imwrite(f'{images_path}/frame_{i}_angle_{alpha}_yzplane.png', img_yz)
+
     print(f'Iteration {i + 1}\n')
-   
+
+print(f"\nSuccess. file saved in{images_path}")
