@@ -125,6 +125,7 @@ def yzimage(A, B, img):
     pass
 
 # todo: add .png files and weight file to git ignore.
+# todo: write main function.
 
 np.random.seed(42)
 images_path = os.path.expanduser("~/PycharmProjects/syndataset/")
@@ -149,10 +150,10 @@ for i in range(1000):
 
     # save images
     # cv2.imwrite(f'{images_path}/frame_{i}_angle_{alpha_xy_3d}_xyplane.png', img_xy)
-    cv2.imwrite(f'{images_path}/frame_{i}_angle_{alpha}_xyplane.png', img_xy)
-    cv2.imwrite(f'{images_path}/frame_{i}_angle_{alpha}_flippedxyplane.png', flipped_xy)
-    cv2.imwrite(f'{images_path}/frame_{i}_angle_{alpha}_yzplane.png', img_yz)
-
-    print(f'Iteration {i + 1}\n')
-
+    cv2.imwrite(f'{images_path}/cam0_frame_{i}_angle_{alpha}_xyplane.png', img_xy)
+    cv2.imwrite(f'{images_path}/cam1_frame_{i}_angle_{alpha}_flippedxyplane.png', flipped_xy)
+    cv2.imwrite(f'{images_path}/cam2_frame_{i}_angle_{alpha}_yzplane.png', img_yz)
+    # todo: print every 10 iterations
+    #print(f'Iteration {i + 1}\n')
+    #
 print(f"\nSuccess. file saved in{images_path}")
