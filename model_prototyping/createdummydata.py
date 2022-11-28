@@ -7,7 +7,7 @@ import matplotlib as mpl
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 
-
+NUM_FRAMES = 10 # the resulting number of images = NUM_FRAMES * 3. e.g Num_Frames=10 >> num_images=30
 RESNET_INPUT_SIZE = 224
 IMG_SIZE = RESNET_INPUT_SIZE
 THICKNESS = 5
@@ -26,7 +26,6 @@ def twopoints3d(IMG_SIZE):
     x1 = int(np.random.randint(1, high=IMG_SIZE - 1, size=None, dtype=int))
     y1 = int(np.random.randint(1, high=IMG_SIZE - 1, size=None, dtype=int))
     z1 = int(np.random.randint(1, high=IMG_SIZE - 1, size=None, dtype=int))
-    #np.random.seed(41)
     x2 = int(np.random.randint(1, high=IMG_SIZE - 1, size=None, dtype=int))
     y2 = int(np.random.randint(1, high=IMG_SIZE - 1, size=None, dtype=int))
     z2 = int(np.random.randint(1, high=IMG_SIZE - 1, size=None, dtype=int))
@@ -92,6 +91,13 @@ def angle3d(vec1, vec2):
     alpha = int(acos(nom / denom) * 180 /pi)
     return alpha
 
+def gtimage(A, B, img_gt):
+    # image with a line inclined with ground truth angle.
+    x1, y1, z1 = A
+    x2, y2, z2 = B
+    cv2.line(img_gt, (x1, y1), (x2, y2), (B_intensity,G,R), THICKNESS)
+    pass
+
 def xyimage(A, B, img):
     """
     Get points projection on 2d planes and draw the lines b/w them.
@@ -124,32 +130,41 @@ def yzimage(A, B, img):
     cv2.line(img, (y1, z1), (y2, z2), (B_intensity, G, R), THICKNESS)
     pass
 
-# todo: add .png files and weight file to git ignore.
 # todo: write main function.
 
-np.random.seed(42)
-images_path = os.path.expanduser("~/PycharmProjects/syndataset/")
-if os.path.exists(images_path) and os.path.isdir(images_path):
+np.random.seed(41)
+images_path    = os.path.expanduser(f"~/PycharmProjects/syndataset{NUM_FRAMES}/")
+images_path_gt = os.path.expanduser(f"~/PycharmProjects/syndataset_gt{NUM_FRAMES}/")
+if os.path.exists(images_path) and os.path.isdir(images_path) and os.path.exists(images_path_gt) and os.path.isdir(images_path_gt):
     # deletes the directory
     shutil.rmtree(images_path)
+    shutil.rmtree(images_path_gt)
     pass
 os.makedirs(images_path, exist_ok=True)
+os.makedirs(images_path_gt, exist_ok=True)
 
-for i in range(1000):
+
+for i in range(NUM_FRAMES):
     A, B = twopoints3d(IMG_SIZE)
     P = xyplaneintersection(A, B)
     vec1, vec2 = twovectors(P, A)
     alpha = angle3d(vec1, vec2)
+
+    img_gt = np.zeros((IMG_SIZE, IMG_SIZE, 3), np.uint8)
+    gtimage(A, B, img_gt)
+
     img_xy = np.zeros((IMG_SIZE, IMG_SIZE, 3), np.uint8)
     xyimage(A, B, img_xy)
+
     img_yz = np.zeros((IMG_SIZE, IMG_SIZE, 3), np.uint8)
     yzimage(A, B, img_yz)
-
     # flipped xy-plane image
     flipped_xy = cv2.flip(img_xy, 1)  # horizontal flip.
 
     # save images
     # cv2.imwrite(f'{images_path}/frame_{i}_angle_{alpha_xy_3d}_xyplane.png', img_xy)
+    cv2.imwrite(f'{images_path_gt}/cam0_frame_{i}_angle_{alpha}_xyplane.png', img_gt)
+
     cv2.imwrite(f'{images_path}/cam0_frame_{i}_angle_{alpha}_xyplane.png', img_xy)
     cv2.imwrite(f'{images_path}/cam1_frame_{i}_angle_{alpha}_flippedxyplane.png', flipped_xy)
     cv2.imwrite(f'{images_path}/cam2_frame_{i}_angle_{alpha}_yzplane.png', img_yz)
